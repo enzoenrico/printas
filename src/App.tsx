@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Tabs } from './components/ui/tabs'
@@ -9,7 +9,6 @@ import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
 import { Button } from './components/ui/button'
 
-import { IconSelect } from './components/iconselect/IconSelect'
 import { OctoPIConn } from './api'
 import {
   AlertDialog,
@@ -27,6 +26,8 @@ import {
   AccordionTrigger
 } from './components/ui/accordion'
 import { AccordionItem } from '@radix-ui/react-accordion'
+import { Group } from 'three'
+import { exportModel } from './lib/utils'
 
 function App () {
   const [userInput, setUserInput] = useState<string | null>(null)
@@ -34,6 +35,8 @@ function App () {
 
   const [peopleInput, setPeopleInput] = useState<string>('')
   const [people, setPeople] = useState<string[]>([])
+
+  const customGroupRef = useRef<Group>(null)
 
   const connection = new OctoPIConn(
     'kStmkMm2alHNREUwsZPqUiiFgfgwWeDb8FVeMcSRHxQ'
@@ -71,36 +74,36 @@ function App () {
     })
   }
 
+  const handleDownload = async () => {
+    console.log('starting download')
+    if (!customGroupRef) return
+    const blob = await exportModel(customGroupRef.current)
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'model.glb'
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
       {/* main app div */}
       <div className='bg-[#000528] w-screen h-screen flex items-center justify-around  text-white text-5xl p-5 gap-4'>
         {/* visualizer here */}
         <div className='w-1/5 h-full border-2 border-white rounded-xl '>
-          <Preview model='trophy' spin={true} grid={false} color='#000528' />
+          <Preview
+            model='trophy'
+            spin={true}
+            grid={false}
+            color='#000528'
+            // groupRef={customGroupRef}
+          />
         </div>
 
         {/* printing details here */}
         <div div className='w-4/5 h-full pt-0'>
           <Tabs defaultValue='details' className='w-full  h-full flex flex-col'>
-            {/* <TabsList className='border-t-2 border-x-2 rounded-t-xl rounded-b-none border-white flex justify-start  transition-colors gap-2'>
-              <TabsTrigger
-                value='details'
-                onClick={() => setTheme('dark')}
-                className='px-4 py-2 border-b-2 border-transparent gap-2 max-h-8'
-              >
-                <TerminalSquare className='w-5' />
-                details
-              </TabsTrigger>
-              <TabsTrigger
-                value='printing'
-                onClick={() => setTheme('light')}
-                className='px-4 py-2 border-b-2 border-transparent max-h-8 gap-2 '
-              >
-                <PrinterCheckIcon className='w-5' />
-                printing
-              </TabsTrigger>
-            </TabsList> */}
             <TabsContent
               value='details'
               className='p-4 border-2 border-white h-full rounded-md bg-zinc-800 
@@ -199,7 +202,7 @@ function App () {
 
                         {/* Button Operations */}
                         <Label htmlFor='export'>Download</Label>
-                        <Button type='button' onClick={() => console.log('ok')}>
+                        <Button type='button' onClick={handleDownload}>
                           Download model (.glb)
                         </Button>
                         <Label htmlFor='export'>Print</Label>
@@ -234,7 +237,9 @@ function App () {
                       <Preview
                         model='base'
                         displayText={modelText}
+                        people={people}
                         className='border'
+                        groupRef={customGroupRef}
                       />
                     </div>
                   </div>

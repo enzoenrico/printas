@@ -69,7 +69,7 @@ export class OctoPIConn {
     }
 
     public sendToPrinter(file: File): Promise<Response> {
-        return new Promise<Response>()
+        return this.octoFetch('/job', 'POST')
     }
 
 }

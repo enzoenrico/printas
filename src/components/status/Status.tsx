@@ -93,7 +93,7 @@ export const Status = ({ props }: { props: OctoPIConn }) => {
             variant={'default'}
           >
             <AlertDescription>
-              ETA: {printerState?.print_eta} seconds
+              ETA: {printerState?.print_eta || 0} seconds
             </AlertDescription>
           </Alert>
 
@@ -106,18 +106,24 @@ export const Status = ({ props }: { props: OctoPIConn }) => {
             {/* fix this height */}
             <AlertDescription className='max-h-min'>
               <div className='flex flex-col'>
-                <p className='text-sm'> Bed: {printerState?.bed_temperature}</p>
                 <p className='text-sm'>
                   {' '}
-                  Tool: {printerState?.tool_temperature}
+                  Bed: {printerState?.bed_temperature || 0} °C
+                </p>
+                <p className='text-sm'>
+                  {' '}
+                  Tool: {printerState?.tool_temperature || 0} °C
                 </p>
               </div>
             </AlertDescription>
           </Alert>
 
           {/* printer model being printed */}
-          <Badge className='w-4/6 h-11' variant={'secondary'}>
-            Printing: {printerState?.print_name}
+          <Badge
+            className='w-4/6 h-11 flex items-center justify-center'
+            variant={printerState?.printing ? 'secondary' : 'destructive'}
+          >
+            Printing: {printerState?.print_name || 'nothing'}
           </Badge>
         </CardHeader>
       </Card>
