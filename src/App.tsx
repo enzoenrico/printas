@@ -34,6 +34,7 @@ function App () {
   const [modelText, setModelText] = useState<string>('')
 
   const [peopleInput, setPeopleInput] = useState<string>('')
+  const [areaInput, setAreaInput] = useState<string>('')
   const [people, setPeople] = useState<string[]>([])
 
   const customGroupRef = useRef<Group>(null)
@@ -89,14 +90,16 @@ function App () {
   return (
     <>
       {/* main app div */}
+
       <div className='bg-[#000528] w-screen h-screen flex items-center justify-around  text-white text-5xl p-5 gap-4'>
         {/* visualizer here */}
         <div className='w-1/5 h-full border-2 border-white rounded-xl '>
           <Preview
             model='trophy'
-            spin={true}
+            spinZ
             grid={false}
             color='#000528'
+            cam_position={[0, -15, 5]}
             // groupRef={customGroupRef}
           />
         </div>
@@ -121,6 +124,7 @@ function App () {
                         <Label htmlFor='custom-text'>Custom text</Label>
                         <div className='flex gap-2'>
                           <Input
+                            value={userInput}
                             className='w-3/4'
                             id='custom-text'
                             onChange={e => setUserInput(e.target.value)}
@@ -150,11 +154,18 @@ function App () {
 
                         <div className='flex flex-col gap-4'>
                           <Label htmlFor='people'> People / Area </Label>
-                          <div className='flex gap-2'>
+                          <div div className='flex gap-2'>
                             <Input
                               className='w-3/4'
                               id='custom-text'
+                              placeholder='Name'
                               onChange={e => setPeopleInput(e.target.value)}
+                            />
+                            <Input
+                              className='w-3/4'
+                              placeholder='Area'
+                              id='custom-text'
+                              onChange={e => setAreaInput(e.target.value)}
                             />
                             <Button type='submit' onClick={handlePeopleText}>
                               Add
@@ -190,7 +201,7 @@ function App () {
                                         {person}
                                       </p>
                                       <p className='font-light text-gray-500 text-xl'>
-                                        {person}
+                                        {areaInput}
                                       </p>
                                     </div>
                                   </div>
@@ -240,6 +251,7 @@ function App () {
                         people={people}
                         className='border'
                         groupRef={customGroupRef}
+                        cam_position={[5, 3, 3]}
                       />
                     </div>
                   </div>

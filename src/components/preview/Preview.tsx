@@ -4,7 +4,6 @@ import { useRef, Suspense, useState, Ref } from 'react'
 import { Group, Box3, Vector3 } from 'three'
 import helvetiker from 'three/examples/fonts/helvetiker_regular.typeface.json'
 import { Mesh } from 'three'
-import { exportModel } from '../../lib/utils'
 
 type models = 'trophy' | 'base'
 
@@ -12,8 +11,10 @@ export interface Tpreview {
   displayText: string
   model: models
   people: string[]
+  cam_position?: number[]
   grid?: boolean
-  spin?: boolean
+  spinY?: boolean
+  spinZ?: boolean
   color?: string
   groupRef?: Ref
 }
@@ -37,7 +38,14 @@ const chooseModel = (model: models) => {
   }
 }
 
-const Model = ({ textToDisplay, people, model, spin, groupRef }: Tpreview) => {
+const Model = ({
+  textToDisplay,
+  people,
+  model,
+  spinY,
+  spinZ,
+  groupRef
+}: Tpreview) => {
   //trophy model ref
   const meshRef = useRef<Group>(null)
 
@@ -67,32 +75,32 @@ const Model = ({ textToDisplay, people, model, spin, groupRef }: Tpreview) => {
   }, [scene])
 
   useFrame(() => {
-    if (spin && meshRef.current) {
+    if (spinZ && meshRef.current) {
       meshRef.current.rotateZ(0.005)
-      //   meshRef.current.rotateX(0.005)
-      //   meshRef.current.rotateY(0.005)
+      // meshRef.current.rotateX(0.005)
+      // meshRef.current.rotateY(0.005)
+    }
+    if (spinY && meshRef.current) {
+      //   meshRef.current.rotateZ(0.005)
+      // meshRef.current.rotateX(0.005)
+      meshRef.current.rotateY(0.005)
     }
   })
 
   return (
     <group ref={groupRef}>
-      <primitive
-        ref={meshRef}
-        object={scene}
-        scale={10}
-        position={[0, 0, 0]}
-      />
+      <primitive ref={meshRef} object={scene} scale={10} position={[0, 0, 0]} />
       {textToDisplay && (
         <Text3D
           ref={textRef}
           font={helvetiker}
-          position={[-0.3, modelDimensions.size.y / 8, 0.4]}
+          position={[-0.38, modelDimensions.size.y / 8, 0.3]}
           size={
             modelDimensions.size.x *
-            (0.1 / Math.ceil(textToDisplay.length / 20)) *
+            (0.1 / Math.ceil(textToDisplay.length / 12)) *
             (textToDisplay.length > 40 ? 0.7 : 1)
           }
-          height={0.1}
+          height={0.25}
           curveSegments={12}
           bevelEnabled
           bevelThickness={0.01}
@@ -100,8 +108,8 @@ const Model = ({ textToDisplay, people, model, spin, groupRef }: Tpreview) => {
           bevelOffset={0}
           bevelSegments={5}
         >
-          {textToDisplay.length > 10
-            ? textToDisplay.slice(0, 10) + '\n' + textToDisplay.slice(10)
+          {textToDisplay.length > 18
+            ? textToDisplay.split(' ') + '\n' + textToDisplay.split(' ')[1]
             : textToDisplay}
           <meshPhongMaterial
             color='white'
@@ -116,14 +124,14 @@ const Model = ({ textToDisplay, people, model, spin, groupRef }: Tpreview) => {
         <Text3D
           ref={peopleRef}
           font={helvetiker}
-          position={[0.2, modelDimensions.size.y / 8, -0.5]}
+          position={[0.2, modelDimensions.size.y / 8 + 0.05, -0.5]}
           scale={[-1, 1, 1]}
           size={
             modelDimensions.size.x *
-            (0.1 / Math.ceil(people[0].length / 20)) *
-            (people[0].length > 40 ? 0.7 : 1)
+            (0.09 / Math.ceil(people[0].length / 20)) *
+            (people[0].length > 40 ? 0.09 : 1)
           }
-          height={0.1}
+          height={0.5}
           curveSegments={12}
           bevelEnabled
           bevelThickness={0.01}
@@ -150,16 +158,18 @@ const Preview = ({
   displayText,
   model,
   people,
-  spin,
+  spinZ,
+  spinY,
   grid,
   groupRef,
+  cam_position = [0, -10, 0],
   color = '#27272a'
 }: Tpreview) => {
   return (
     // Starter camera position
     <Canvas
       shadows
-      camera={{ position: [0, -10, 0], fov: 30 }}
+      camera={{ position: [...cam_position], fov: 30 }}
       className='rounded-xl'
     >
       {/* Soft ambient light */}
@@ -193,8 +203,9 @@ const Preview = ({
           textToDisplay={displayText}
           model={model}
           people={people}
-          spin={spin}
           groupRef={groupRef}
+          spinY={spinY}
+          spinZ={spinZ}
           grid={grid}
         />
       </Suspense>

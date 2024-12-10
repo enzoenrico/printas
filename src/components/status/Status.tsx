@@ -80,7 +80,7 @@ export const Status = ({ props }: { props: OctoPIConn }) => {
                   <Loading />
                 </HoverCardTrigger>
                 <HoverCardContent className='text-sm'>
-                  Connectivity: 3ms
+                  Connectivity: 13ms
                 </HoverCardContent>
               </HoverCard>
             </AlertDescription>
@@ -93,7 +93,7 @@ export const Status = ({ props }: { props: OctoPIConn }) => {
             variant={'default'}
           >
             <AlertDescription>
-              ETA: {printerState?.print_eta || 0} seconds
+              ETA: {Math.floor(printerState?.print_eta / 60 / 60) || 0} hours
             </AlertDescription>
           </Alert>
 
@@ -104,7 +104,7 @@ export const Status = ({ props }: { props: OctoPIConn }) => {
             variant={'default'}
           >
             {/* fix this height */}
-            <AlertDescription className='max-h-min'>
+            <AlertDescription className=''>
               <div className='flex flex-col'>
                 <p className='text-sm'>
                   {' '}
